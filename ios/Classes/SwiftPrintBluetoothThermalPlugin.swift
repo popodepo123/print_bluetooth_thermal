@@ -289,36 +289,18 @@ public class SwiftPrintBluetoothThermalPlugin: NSObject, CBCentralManagerDelegat
     }
 
     // Implementación del método peripheral(_:didDiscoverCharacteristicsFor:error:) para buscar las caracteristicas del dispositivo bluetooth
-    public func peripheral(_ peripheral: CBPeripheral, didDiscoverCharacteristicsFor service: CBService, error: Error?) {
-        if let error = error {
-            print("Error discovering characteristics: \(error.localizedDescription)")
-            return
-        }
+public func peripheral(_ peripheral: CBPeripheral, didDiscoverCharacteristicsFor service: CBService, error: Error?) {
+if let error = error {
+print("Error discovering characteristics: (error.localizedDescription)")
+return
+}
 
-        if let discoveredCharacteristics = service.characteristics {
-            for characteristic in discoveredCharacteristics {
-                //print("characteristics found: \(characteristic.uuid)")
-                if let characteristic = targetCharacteristic {
-                    if characteristic.properties.contains(.write) {
-                        // La característica admite escritura
-                        print("characteristics found: \(characteristic.uuid) La característica admite escritura")
-                    } else {
-                        // La característica no admite escritura
-                        print("characteristics found: \(characteristic.uuid) La característica no admite escritura")
-                    }
-                }
-
-                let targetCharacteristicUUID = CBUUID(string: "00001101-0000-1000-8000-00805F9B34FB")
-                let targetCharacteristicUUID2 =  CBUUID(string: "49535343-8841-43F4-A8D4-ECBE34729BB3")
-
-                if characteristic.uuid == targetCharacteristicUUID || characteristic.uuid == targetCharacteristicUUID2 {
-                    targetCharacteristic = characteristic // Guarda la característica objetivo en la variable global
-                    print("Target characteristic found: \(characteristic.uuid)")
-                    break
-                }
-            }
-        }
-    }
+if let discoveredCharacteristics = service.characteristics {
+for characteristic in discoveredCharacteristics {
+print("characteristics found: (characteristic.uuid)")
+}
+}
+}
 
     // Implementación del método peripheral(_:didWriteValueFor:error:) para saber si la impresion fue exitosa si se pasa .withResponse
     public func peripheral(_ peripheral: CBPeripheral, didWriteValueFor characteristic: CBCharacteristic, error: Error?) {
