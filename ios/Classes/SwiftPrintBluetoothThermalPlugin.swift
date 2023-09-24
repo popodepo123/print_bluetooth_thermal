@@ -93,7 +93,7 @@ public class SwiftPrintBluetoothThermalPlugin: NSObject, CBCentralManagerDelegat
       }
 
         // despues de 5 segundos se para la busqueda y se devuelve la lista de dispositivos disponibles
-        DispatchQueue.main.asyncAfter(deadline: .now() + 15) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
             self.centralManager?.stopScan()
             print("Stopped scanning -> Discovered devices: \(self.discoveredDevices.count)")
             result(self.discoveredDevices)
@@ -259,48 +259,42 @@ public class SwiftPrintBluetoothThermalPlugin: NSObject, CBCentralManagerDelegat
     }
 
      //detectar los servicios descubiertos y guardarlo para poder imprimir
-    public func peripheral(_ peripheral: CBPeripheral, didDiscoverServices error: Error?) {
-           if let error = error {
-               print("Error discovering services: \(error.localizedDescription)")
-               return
-           }
-
-           if let services = peripheral.services {
-               for service in services {
-                   print("Service discovered: \(service.uuid)")
-
-                   // Verifica si el servicio es el que estás buscando
-                   let targetServiceUUID = CBUUID(string: "00001101-0000-1000-8000-00805F9B34FB")
-                   let targetServiceUUID2 =  CBUUID(string: "49535343-FE7D-4AE5-8FA9-9FAFD205E455")
-                   if service.uuid == targetServiceUUID || service.uuid == targetServiceUUID2 {
-                       print("Service found: \(service.uuid)") 
-                       // Por ejemplo, puedes descubrir las características del servicio
-                       peripheral.discoverCharacteristics(nil, for: service)
-
-                       // También puedes almacenar el servicio en una variable para futuras referencias
-                       // targetService = service
-                       self.targetService = service;
-                   }
-
-                   // Aquí puedes realizar operaciones adicionales con cada servicio encontrado, como descubrir características
-                   peripheral.discoverCharacteristics(nil, for: service)
-               }
-           }
+public func peripheral(_ peripheral: CBPeripheral, didDiscoverServices error: Error?) {
+    if let error = error {
+        print("Error discovering services: \(error.localizedDescription)")
+        return
     }
+
+    if let services = peripheral.services {
+        for service in services {
+            print("Service discovered: \(service.uuid)")
+
+            // Discover characteristics for every service
+            peripheral.discoverCharacteristics(nil, for: service)
+        }
+    }
+}
+
 
     // Implementación del método peripheral(_:didDiscoverCharacteristicsFor:error:) para buscar las caracteristicas del dispositivo bluetooth
 public func peripheral(_ peripheral: CBPeripheral, didDiscoverCharacteristicsFor service: CBService, error: Error?) {
-if let error = error {
-print("Error discovering characteristics: (error.localizedDescription)")
-return
+    if let error = error {
+        print("Error discovering characteristics: \(error.localizedDescription)")
+        return
+    }
+
+    if let discoveredCharacteristics = service.characteristics {
+        for characteristic in discoveredCharacteristics {
+            print("Characteristics found: \(characteristic.uuid)")
+            if characteristic.properties.contains(.write) {
+                print("The characteristic supports write.")
+            } else {
+                print("The characteristic does not support write.")
+            }
+        }
+    }
 }
 
-if let discoveredCharacteristics = service.characteristics {
-for characteristic in discoveredCharacteristics {
-print("characteristics found: (characteristic.uuid)")
-}
-}
-}
 
     // Implementación del método peripheral(_:didWriteValueFor:error:) para saber si la impresion fue exitosa si se pasa .withResponse
     public func peripheral(_ peripheral: CBPeripheral, didWriteValueFor characteristic: CBCharacteristic, error: Error?) {
@@ -341,5 +335,4 @@ print("characteristics found: (characteristic.uuid)")
     }
 
 }
-
 
