@@ -93,7 +93,7 @@ public class SwiftPrintBluetoothThermalPlugin: NSObject, CBCentralManagerDelegat
       }
 
         // despues de 5 segundos se para la busqueda y se devuelve la lista de dispositivos disponibles
-        DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 15) {
             self.centralManager?.stopScan()
             print("Stopped scanning -> Discovered devices: \(self.discoveredDevices.count)")
             result(self.discoveredDevices)
@@ -114,7 +114,7 @@ public class SwiftPrintBluetoothThermalPlugin: NSObject, CBCentralManagerDelegat
         centralManager?.connect(peripheral, options: nil)
 
         // Verifica si la conexión fue exitosa después de un tiempo de espera
-        DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 15) {
             if peripheral.state == .connected {
                 //print("Conexión exitosa con el dispositivo \(peripheral.name ?? "Desconocido")")
                 self.connectedPeripheral = peripheral
